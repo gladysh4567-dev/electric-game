@@ -1,0 +1,19 @@
+<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Zombie City</title>
+<style>html,body{margin:0;overflow:hidden;background:#111;color:white;font-family:Arial;touch-action:none}canvas{display:block}#hud{position:fixed;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;font-weight:bold;font-size:18px;text-shadow:0 2px 3px #000;pointer-events:none}#joy{position:fixed;left:25px;bottom:30px;width:130px;height:130px;border-radius:50%;background:#ffffff22;border:2px solid #ffffff44}.knob{position:absolute;width:50px;height:50px;left:40px;top:40px;border-radius:50%;background:#ffffff66}.atk{position:fixed;right:25px;bottom:45px;width:80px;height:80px;border-radius:50%;border:0;background:#d32f2f;color:white;font-size:28px;font-weight:bold}.start{position:fixed;inset:0;background:#081018ee;display:grid;place-items:center;text-align:center}.card{background:#1d2938;padding:25px;border-radius:22px;margin:25px}.play{padding:15px 30px;border:0;border-radius:12px;background:#ef4444;color:white;font-size:18px;font-weight:bold}</style></head>
+<body><canvas id="c"></canvas><div id="hud">❤️ ∞ <span>🧟 <b id="n">0</b></span><span>🏙️ ZOMBIE CITY</span></div><div id="joy"><div class="knob" id="k"></div></div><button class="atk" id="a">👊</button><div class="start" id="s"><div class="card"><h1>🧟 ZOMBIE CITY</h1><p>Твоє життя нескінченне ❤️∞<br>Ходи містом та бий зомбі.</p><button class="play" id="p">▶ ПОЧАТИ</button></div></div>
+<script>
+const c=document.getElementById('c'),x=c.getContext('2d');let W,H,D,run=false,px,py,z=[],mx=0,my=0,attack=0;
+function size(){D=devicePixelRatio;W=innerWidth;H=innerHeight;c.width=W*D;c.height=H*D;x.setTransform(D,0,0,D,0,0)}size();onresize=size;
+function start(){px=1500;py=1100;z=[];for(let i=0;i<20;i++){let q=Math.random()*6.28,d=250+Math.random()*700;z.push({x:px+Math.cos(q)*d,y:py+Math.sin(q)*d})}run=true;document.getElementById('s').style.display='none';requestAnimationFrame(loop)}
+function draw(){x.fillStyle='#202b22';x.fillRect(0,0,W,H);let camx=px-W/2,camy=py-H/2;x.save();x.translate(-camx,-camy);
+x.fillStyle='#3b4044';for(let i=0;i<3000;i+=360)x.fillRect(i,0,100,2200);for(let i=0;i<2200;i+=360)x.fillRect(0,i,3000,100);
+for(let i=0;i<40;i++){let bx=(i*577)%2800+50,by=(i*331)%2000+50;x.fillStyle='#58616b';x.fillRect(bx,by,180,140);x.fillStyle='#9bb3c2';for(let q=0;q<3;q++)x.fillRect(bx+20+q*50,by+25,25,30)}
+z.forEach(v=>{x.fillStyle='#78966d';x.beginPath();x.arc(v.x,v.y,17,0,7);x.fill();x.fillStyle='#111';x.fillRect(v.x-7,v.y-4,4,4);x.fillRect(v.x+3,v.y-4,4,4)});
+x.fillStyle='#2784ff';x.beginPath();x.arc(px,py,18,0,7);x.fill();x.fillStyle='#f2c6a5';x.beginPath();x.arc(px,py-14,9,0,7);x.fill();x.restore()}
+function loop(t){if(!run)return;px+=mx*4;py+=my*4;px=Math.max(20,Math.min(2980,px));py=Math.max(20,Math.min(2180,py));z.forEach(v=>{let dx=px-v.x,dy=py-v.y,d=Math.hypot(dx,dy)||1;if(d<650){v.x+=dx/d*1.1;v.y+=dy/d*1.1}});if(attack&&performance.now()-attack>220)attack=0;draw();document.getElementById('n').textContent=z.length;requestAnimationFrame(loop)}
+const joy=document.getElementById('joy'),k=document.getElementById('k');let id;
+function move(e){let r=joy.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),m=Math.hypot(dx,dy),M=45;if(m>M){dx*=M/m;dy*=M/m}k.style.transform=`translate(${dx}px,${dy}px)`;mx=dx/M;my=dy/M}
+joy.onpointerdown=e=>{id=e.pointerId;joy.setPointerCapture(id);move(e)};joy.onpointermove=e=>{if(e.pointerId==id)move(e)};joy.onpointerup=()=>{mx=my=0;k.style.transform='translate(0,0)'};joy.onpointercancel=joy.onpointerup;
+document.getElementById('a').onpointerdown=()=>{attack=performance.now();z=z.filter(v=>Math.hypot(v.x-px,v.y-py)>85)};
+document.getElementById('p').onclick=start;
+</script></body></html>
